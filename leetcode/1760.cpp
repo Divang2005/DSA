@@ -7,7 +7,7 @@ public:
     int minimumSize(vector<int> &nums, int maxOperations)
     {
         int l = 1;
-        int r = ranges::max(nums);
+        int r = *max_element(nums.begin(), nums.end());
 
         while (l < r)
         {
