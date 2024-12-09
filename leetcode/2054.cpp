@@ -24,19 +24,29 @@ public:
             const int start = event[0];
             const int end = event[1];
             const int value = event[2];
-            evts.emplace_back(start, value, true);
-            evts.emplace_back(end + 1, value, false);
+            evts.push_back({start, value, true});
+            evts.push_back({end + 1, value, false});
         }
 
-        ranges::sort(evts, [](const Event &a, const Event &b)
-                     { return a.time == b.time ? a.isStart < b.isStart : a.time < b.time; });
+        sort(evts.begin(), evts.end(), [](const Event &a, const Event &b)
+             { return a.time == b.time ? a.isStart < b.isStart : a.time < b.time; });
 
-        for (const auto &[_, value, isStart] : evts)
-            if (isStart)
-                ans = max(ans, value + maxValue);
+        for (const Event &evt : evts)
+        {
+            if (evt.isStart)
+                ans = max(ans, evt.value + maxValue);
             else
-                maxValue = max(maxValue, value);
+                maxValue = max(maxValue, evt.value);
+        }
 
         return ans;
     }
 };
+
+int main()
+{
+    vector<vector<int>> events = {{1, 3, 4}, {2, 5, 6}, {7, 9, 8}};
+    Solution solution;
+    cout << "Maximum value of the events: " << solution.maxTwoEvents(events) << endl;
+    return 0;
+}
