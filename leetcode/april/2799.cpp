@@ -1,12 +1,13 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+using namespace std; 
 
 class Solution {
 public:
-    int countCompleteSubarrays(std::vector<int>& nums) {
-        int totalDistinct = std::unordered_set<int>(nums.begin(), nums.end()).size();
-        std::unordered_map<int, int> freq;
+    int countCompleteSubarrays(vector<int>& nums) {
+        int totalDistinct = unordered_set<int>(nums.begin(), nums.end()).size();
+        unordered_map<int, int> freq;
         int left = 0, result = 0;
         for (int right = 0; right < nums.size(); ++right) {
             freq[nums[right]]++;
