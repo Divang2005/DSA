@@ -2,41 +2,46 @@
 using namespace std;
 
 class Solution {
-public:
-    vector<int> queryResults(int limit, vector<vector<int>>& queries) {
-        map<int, unordered_map<int, int>> activeColors; 
-        map<int, int> result;
-
-        for (auto& q : queries) {
-            int start = q[0], end = q[1], color = q[2];
-            activeColors[start][color]++;
-            activeColors[end + 1][color]--;
-        }
-
-        unordered_map<int, int> colorCount;
-        int currentDistinct = 0;
-
-        for (auto& [pos, colorChanges] : activeColors) {
-            for (auto& [color, change] : colorChanges) {
-                int& count = colorCount[color];
-                if (count == 0 && change > 0) currentDistinct++;
-                count += change;
-                if (count == 0) currentDistinct--;
-            }
-            result[pos] = currentDistinct;
-        }
-
-        vector<int> answer;
-        int lastValue = 0;
-        auto it = result.begin();
-        for (int i = 0; i < limit; ++i) {
-            while (it != result.end() && it->first <= i) {
-                lastValue = it->second;
-                ++it;
-            }
-            answer.push_back(lastValue);
-        }
-
-        return answer;
-    }
-};
+    public:
+     int minTimeToReach(vector<vector<int>>& moveTime) {
+       return dijkstra(moveTime, {0, 0},
+                       {moveTime.size() - 1, moveTime[0].size() - 1});
+     }
+   
+    private:
+     int dijkstra(const vector<vector<int>>& moveTime, const pair<int, int>& src,
+                  const pair<int, int>& dst) {
+       constexpr int kDirs[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+       const int m = moveTime.size();
+       const int n = moveTime[0].size();
+       vector<vector<int>> dist(m, vector<int>(n, INT_MAX));
+   
+       dist[0][0] = 0;
+       using T = pair<int, pair<int, int>>;  // (d, u)
+       priority_queue<T, vector<T>, greater<>> minHeap;
+       minHeap.push({dist[0][0], src});
+   
+       while (!minHeap.empty()) {
+         const auto [d, u] = minHeap.top();
+         minHeap.pop();
+         if (u == dst)
+           return d;
+         const auto [i, j] = u;
+         if (d > dist[i][j])
+           continue;
+         for (const auto& [dx, dy] : kDirs) {
+           const int x = i + dx;
+           const int y = j + dy;
+           if (x < 0 || x == m || y < 0 || y == n)
+             continue;
+           const int newDist = max(moveTime[x][y], d) + 1;
+           if (newDist < dist[x][y]) {
+             dist[x][y] = newDist;
+             minHeap.push({newDist, {x, y}});
+           }
+         }
+       }
+   
+       return -1;
+     }
+   };
